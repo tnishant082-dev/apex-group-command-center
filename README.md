@@ -7,12 +7,12 @@ Consulting-style executive rollup for a multi-domain portfolio narrative — **A
 ## Data Scope & Assumptions
 
 - **Sources:** Analysis is built on seven named public datasets (UCI / Kaggle / Mendeley), landed under `data/landing/` with citations in `DATA_SOURCES.csv`.
-- **Operating model:** Apex Bank, Apex Mart, Apex Care, and Apex Logistics are framed as a multi-business operating model so banking, retail, healthcare, and logistics KPIs can sit in one executive reporting environment.
+- **Operating Model:** Apex Bank, Apex Mart, Apex Care, and Apex Logistics are structured as a unified multi-business reporting environment for cross-functional executive analytics.
 - **Reporting grain:** Group ₹ Cr figures are FX-rolled for a unified portfolio view. Source calendars do not fully align; the rollup is an analytical construct, not a statutory consolidated P&L.
 - **Documented proxies:** Telco churn stands in for bank retention signals; formulary “Down” status for expiry risk; cancel / C-invoices for cart-funnel leakage; cost residuals for claims review flags; DataCo on-time proxy (`Late_delivery_risk = 0`) for OTIF.
 - **Sampling:** ULB fraud and DataCo extracts are stratified or sampled for repository size. Rates on the extract (e.g. fraud %) should be interpreted with the sampling design—not as the full-file base rate.
 - **KPI lineage:** Metrics are computed from `data/landing/` → cleaned tables → `data/marts/`, reconciled in SQL and the Excel dictionary / cleaning log / KPI recon workbook.
-- **Limitation:** Insights and recommended actions apply to these extracts and assumptions; they are methodology for a portfolio BI build, not live production telemetry from a single CRM or WMS.
+- **Governance Note:** All insights, KPIs, and recommendations are traceable to documented source datasets, transformation logic, and analytical assumptions included in this repository.
 
 
 ---
