@@ -273,7 +273,7 @@ artifacts/        apex-group-demo.mp4
 
 ---
 
-## Theme mapping (multi-domain coverage)
+## Analyst theme coverage
 
 | Theme | Where it lives | Real source |
 |---|---|---|
