@@ -273,7 +273,7 @@ artifacts/        apex-group-demo.mp4
 
 ---
 
-## Theme mapping (Mansi portfolio coverage)
+## Theme mapping (multi-domain coverage)
 
 | Theme | Where it lives | Real source |
 |---|---|---|
