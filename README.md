@@ -1,10 +1,15 @@
 # Apex Group Command Center
 
+## What is real vs constructed
+- **Real:** 7 named public datasets, KPIs computed from extracts in `data/landing/` → `data/marts/`.
+- **Constructed:** “Apex Group” is a portfolio narrative so four domains share one exec grain. Calendars do not align. ₹ Cr is FX-rolled for a single unit, not a statutory P&L.
+- **Proxies (documented):** Telco → bank churn · formulary “Down” → expiry · cancel/C-invoices → cart funnel · residuals → claims review flags · DataCo late=0 → OTIF.
+- **Samples:** ULB + DataCo are stratified/sampled for GitHub size. Fraud % on the extract ≠ full-file base rate.
+
 Consulting-style executive rollup for a **portfolio conglomerate narrative** — **Apex Bank**, **Apex Mart**, **Apex Care**, and **Apex Logistics** — with shared QoQ performance diagnosis, market-entry scoring, and ops bottleneck audit.
 
 Each BU page is powered by a **named public dataset** (UCI / Kaggle / Mendeley). The Apex Group framing brings the multi-domain analysis together in one executive view for hiring managers.
 
-**GitHub:** [tnishant082-dev/apex-group-command-center](https://github.com/tnishant082-dev/apex-group-command-center)
 
 **Open in Power BI Desktop:** [`dashboard/ApexGroup.pbip`](./dashboard/ApexGroup.pbip) (paths point at `data/marts/*.csv` and `data/cleaned/*.csv`)
 
@@ -67,7 +72,7 @@ Power BI Desktop **Fluent Light** theme — canvas `#F3F2F1`, white cards, accen
 
 ## Key Metrics
 
-Reconciled across `data/marts/`, `sql/03_kpi_marts.sql`, and `excel/apex_group_dictionary_recon.xlsx`.
+Reconciled across `data/marts/`, `sql/03_kpi_marts.sql`, and Excel **Dictionary / Cleaning log / KPI recon** (`excel/apex_group_dictionary_recon.xlsx`).
 
 ### Group (last overlapping source quarter: **2018Q1** on DataCo calendar; labeled as portfolio “last Q”)
 | KPI | Value |
@@ -231,12 +236,24 @@ Reconciled across `data/marts/`, `sql/03_kpi_marts.sql`, and `excel/apex_group_d
 
 ---
 
+## Recommended actions (on these extracts)
+
+| Priority | Action | Lever | Data risk |
+|---|---|---|---|
+| P0 | Reset promise windows on DataCo hot categories / metros (late ~55%, OTIF ~45%) | Delivery SLA + corridor ops | DataCo sample; Late_delivery_risk proxy for OTIF |
+| P1 | Win-back **At Risk** RFM + cut add-to-cart→checkout drop (paid conv ~35%) | Retail CX / lifecycle | Cancel/C-invoice ≠ true abandon; RFM on extract snapshot |
+| P2 | Early-tenure + month-to-month style save plays (Telco churn ~27% as bank proxy) | Retention / offers | Telco≠bank book; segment from charges |
+| P3 | Discharge triage on high readmit-risk bands; transfer/promote formulary “Down” stock (₹0.91 Cr ≤60d) | Care quality + pharmacy | Diabetes sample enrichment; formulary→expiry proxy |
+| P4 | Staff claims review on top residual band (~3.06%); stage **Enter** corridors from scorecard | Claims desk + market entry | Residual≠fraud; composite is transparent rank blend |
+
+
 ## Analysis Process
 
 - Landed public extracts under `data/landing/` (sampled where GitHub size requires)
 - Cleaned analysis tables + KPI marts under `data/cleaned/` and `data/marts/`
-- Dictionary + cleaning log + KPI recon in Excel
-- SQL staging views, quality checks, and KPI pack aligned to the same mart numbers
+- Excel **Dictionary / Cleaning log / KPI recon** (`excel/`)
+- SQL staging views, quality checks, RFM + market-entry packs, and KPI queries aligned to the same mart numbers
+- Python mart rebuild for claims residual flags: `python scripts/build_marts.py`
 - Power BI Desktop project (`.pbip`) with Fluent Light theme; page PNGs + silent walkthrough for portfolio review
 
 ---
@@ -245,8 +262,9 @@ Reconciled across `data/marts/`, `sql/03_kpi_marts.sql`, and `excel/apex_group_d
 
 | Tool | Use |
 |---|---|
-| **SQL** | Staging views, quality checks, KPI / mart queries (`sql/`) |
-| **Excel** | Data dictionary, cleaning log, KPI reconciliation (`excel/`) |
+| **SQL** | Staging, quality checks, RFM, market-entry, KPI marts (`sql/01`–`05`) |
+| **Excel** | Dictionary / Cleaning log / KPI recon (`excel/apex_group_dictionary_recon.xlsx`) |
+| **Python** | mart build / residual flags (`scripts/`) |
 | **Power BI** | 14-page command center report (`dashboard/ApexGroup.pbip`) |
 
 ---
@@ -256,12 +274,14 @@ Reconciled across `data/marts/`, `sql/03_kpi_marts.sql`, and `excel/apex_group_d
 ```text
 data/landing/     public extracts (sampled where needed) + DATA_SOURCES.csv
 data/cleaned/     analysis-ready tables
-data/marts/       KPI and segment marts
-excel/            dictionary + cleaning log + KPI recon
-sql/              staging · quality · KPI marts
+data/marts/       KPI and segment marts (incl. claims residuals)
+excel/            Dictionary / Cleaning log / KPI recon
+sql/              staging · quality · KPI · RFM · market-entry
+scripts/          build_marts.py (claims residuals / optional RFM)
 dashboard/        ApexGroup.pbip + Report + SemanticModel
 screenshots/      one PNG per report page
 artifacts/        apex-group-demo.mp4
+LICENSE           MIT
 ```
 
 ---

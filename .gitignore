@@ -1,8 +1,23 @@
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.Python
 .venv/
+venv/
+.env
 .venv-vertex/
 .DS_Store
+Thumbs.db
 *.tmp
+*.bak
 .ipynb_checkpoints/
 .agent-report/
+
+# Power BI Desktop cache / local
+*.pbix.lock
+*.pbi/localSettings.json
+*.pbi/cache/
+**/Cache/
+**/.pbi/
+*.abf
+AnalysisServicesWorkspace*/
