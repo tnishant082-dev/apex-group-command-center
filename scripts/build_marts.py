@@ -7,11 +7,17 @@ Default: claims residual flags from Medical Cost Personal (landing)
   → refreshes anomaly_flag / anomaly_reason on data/cleaned/care_claims.csv
   → refreshes claims_anomaly_pct on data/marts/mart_care_kpi.csv
 
+  Method: OLS charges ~ age + bmi + smoker + children + intercept.
+  anomaly_flag = 1 when residual_usd >= 95th percentile of residual_usd
+  (positive residual = above expected). Rate is computed from flags — not forced.
+
 Optional: RFM from Online Retail II landing sample
-  → data/marts/mart_retail_rfm.csv
-  Note: the GitHub landing file is a 40k-line sample; a fuller Online Retail II
-  load produced the dashboard PNG headcounts (Champions ~1,028). Rebuilding from
-  the sample alone yields fewer customers — documented, not a silent drift.
+  → data/marts/mart_retail_rfm_from_sample.csv
+
+  Note: Dashboard PNG Champions = 1,028 used a fuller Online Retail II extract
+  than the GitHub landing sample. The published mart_retail_rfm.csv (Champions=1028)
+  is left untouched by this path; sample rebuild writes a separate file and yields
+  fewer customers — documented, not a silent drift.
 
 Usage (repo root):
   python scripts/build_marts.py
@@ -28,8 +34,8 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-FX_INR_PER_USD = 83.0  # matches cleaned care_claims INR roll
-ANOMALY_RATE = 0.0306  # published Key Metric ~3.06%
+# Portfolio convention for INR roll on Medical Cost USD charges (not a market FX feed).
+FX_INR_PER_USD = 83.0
 
 
 def build_claims_residuals() -> Path:
@@ -63,30 +69,26 @@ def build_claims_residuals() -> Path:
     expected_usd = X @ coef
     residual_usd = y - expected_usd
 
-    n_flag = max(1, int(round(len(land) * ANOMALY_RATE)))
-    # Top positive residuals = amount above age/BMI/smoker/children expectation
-    top_idx = np.argsort(residual_usd)[-n_flag:]
-    flag = np.zeros(len(land), dtype=int)
-    flag[top_idx] = 1
+    # Flag positive-tail residuals at/above the 95th percentile (above OLS expected cost).
+    threshold = float(np.percentile(residual_usd, 95))
+    flag = (residual_usd >= threshold).astype(int)
 
-    # Deterministic reason bands on flagged rows (documented proxies)
-    flagged_resid = residual_usd[flag == 1]
-    p75 = np.percentile(flagged_resid, 75) if len(flagged_resid) else 0.0
     reasons: list[str] = []
     for i in range(len(land)):
         if flag[i] == 0:
             reasons.append("")
             continue
         row = land.iloc[i]
-        r = residual_usd[i]
-        if r >= p75:
-            reasons.append("amount_outlier")
-        elif str(row["smoker"]).lower() == "yes":
-            reasons.append("provider_spike")
-        elif abs(float(row["bmi"]) - 30.0) > 8.0:
-            reasons.append("coding_mismatch")
+        is_smoker = str(row["smoker"]).lower() == "yes"
+        high_bmi = float(row["bmi"]) >= 30.0
+        # Allowed reasons: high_residual | smoker_and_high_residual |
+        # high_bmi_and_high_residual | other_high_residual (never provider/coding/duplicate labels).
+        if is_smoker:
+            reasons.append("smoker_and_high_residual")
+        elif high_bmi:
+            reasons.append("high_bmi_and_high_residual")
         else:
-            reasons.append("duplicate_pattern")
+            reasons.append("high_residual")
 
     expected_inr = expected_usd * FX_INR_PER_USD
     residual_inr = residual_usd * FX_INR_PER_USD
@@ -113,13 +115,12 @@ def build_claims_residuals() -> Path:
     mart_path.parent.mkdir(parents=True, exist_ok=True)
     mart.to_csv(mart_path, index=False)
 
-    # Refresh cleaned flags to match rebuild (hire-me: script owns the mart path)
     cleaned = cleaned.copy()
     cleaned["anomaly_flag"] = flag
     cleaned["anomaly_reason"] = [r if r else pd.NA for r in reasons]
     cleaned.to_csv(cleaned_path, index=False)
 
-    anomaly_pct = round(100.0 * flag.mean(), 2)
+    anomaly_pct = round(100.0 * float(flag.mean()), 2)
     if care_kpi_path.exists():
         kpi = pd.read_csv(care_kpi_path)
         if "claims_anomaly_pct" in kpi.columns:
@@ -127,14 +128,25 @@ def build_claims_residuals() -> Path:
             kpi.to_csv(care_kpi_path, index=False)
 
     print(f"Wrote {mart_path.relative_to(ROOT)} ({len(mart):,} rows)")
-    print(f"Claims anomaly rate: {anomaly_pct}% (flagged {int(flag.sum())}/{len(flag)})")
+    print(
+        f"Claims anomaly rate: {anomaly_pct}% "
+        f"(flagged {int(flag.sum())}/{len(flag)}; residual_usd p95={threshold:.4f})"
+    )
     print(f"OLS coef [age, bmi, smoker, children, intercept]: {coef.round(4).tolist()}")
+    print("Reason counts (flagged):")
+    print(pd.Series([r for r in reasons if r]).value_counts().to_string())
     return mart_path
 
 
 def build_rfm() -> Path:
+    """Rebuild RFM from the GitHub landing sample only.
+
+    Writes data/marts/mart_retail_rfm_from_sample.csv and does NOT overwrite
+    mart_retail_rfm.csv (published Champions=1028 from a fuller Online Retail II
+    extract used for the dashboard PNG).
+    """
     landing = ROOT / "data/landing/online_retail_ii_sample.csv"
-    mart_path = ROOT / "data/marts/mart_retail_rfm.csv"
+    mart_path = ROOT / "data/marts/mart_retail_rfm_from_sample.csv"
 
     retail = pd.read_csv(landing)
     retail["InvoiceDate"] = pd.to_datetime(retail["InvoiceDate"])
@@ -198,7 +210,8 @@ def build_rfm() -> Path:
     print(f"Wrote {mart_path.relative_to(ROOT)} ({len(out):,} customers)")
     print(out["segment"].value_counts().to_string())
     print(
-        "Note: sample landing → fewer customers than fuller-extract dashboard PNG (~5,081)."
+        "Note: sample landing → fewer customers than fuller-extract dashboard PNG "
+        "(Champions=1,028 in mart_retail_rfm.csv; left untouched)."
     )
     return mart_path
 

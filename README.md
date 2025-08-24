@@ -6,14 +6,14 @@ Consulting-style executive rollup for a multi-domain portfolio narrative — **A
 
 ## Data Scope & Assumptions
 
-- **Sources:** Analysis is built on seven named public datasets (UCI / Kaggle / Mendeley), landed under `data/landing/` with citations in `DATA_SOURCES.csv`.
-- **Operating Model:** Apex Bank, Apex Mart, Apex Care, and Apex Logistics are structured as a unified multi-business reporting environment for cross-functional executive analytics.
-- **Reporting grain:** Group ₹ Cr figures are FX-rolled for a unified portfolio view. Source calendars do not fully align; the rollup is an analytical construct, not a statutory consolidated P&L.
-- **Documented proxies:** Telco churn stands in for bank retention signals; formulary “Down” status for expiry risk; cancel / C-invoices for cart-funnel leakage; cost residuals for claims review flags; DataCo on-time proxy (`Late_delivery_risk = 0`) for OTIF.
-- **Sampling:** ULB fraud and DataCo extracts are stratified or sampled for repository size. Rates on the extract (e.g. fraud %) should be interpreted with the sampling design—not as the full-file base rate.
-- **KPI lineage:** Metrics are computed from `data/landing/` → cleaned tables → `data/marts/`, reconciled in SQL and the Excel dictionary / cleaning log / KPI recon workbook.
+- **Sources (real public datasets):** Analysis is built on seven named public datasets (UCI / Kaggle / Mendeley), landed under `data/landing/` with citations in `DATA_SOURCES.csv`. Lineage: `data/landing/` → `data/cleaned/` → `data/marts/`.
+- **Operating Model:** Apex Bank, Apex Mart, Apex Care, and Apex Logistics are structured as a unified multi-business reporting environment for cross-functional executive analytics (portfolio narrative across four domains).
+- **Reporting grain:** Group ₹ Cr figures are FX-rolled for a unified portfolio view. Source calendars do not fully align; the last overlapping source quarter on the DataCo calendar is **2018Q1** (reported as portfolio “last Q”). The rollup is an analytical construct, not a statutory consolidated P&L.
+- **Documented proxies:** Telco churn stands in for bank retention signals; formulary “Down” status for expiry risk; cancel / C-invoices for cart-funnel leakage; claims flags = high OLS residual vs age / bmi / smoker / children (95th-percentile residual tail — not investigated fraud); DataCo on-time proxy (`Late_delivery_risk = 0`) for OTIF.
+- **Sampling:** ULB fraud, DataCo, and Online Retail II extracts are stratified or sampled for repository size. Fraud % on the extract ≠ full ULB base rate (~0.17%). **Dashboard RFM Champions (1,028) used a fuller Online Retail II extract than the GitHub landing sample**; published `data/marts/mart_retail_rfm.csv` holds that headcount; sample rebuild writes `mart_retail_rfm_from_sample.csv`.
+- **Cart sessions:** Funnel counts in `mart_cart_funnel` are calibrated sessions (viewed→paid = 10,500 / 30,000 = **35.0%**), not raw web hits. Checkout→paid (10,500 / 11,776 ≈ **89.16%**) is a stage rate, not the primary conversion KPI.
+- **KPI lineage:** Metrics are computed from `data/landing/` → cleaned tables → `data/marts/`, reconciled in SQL and the Excel dictionary / cleaning log / KPI recon workbook. Claims anomaly % is rebuilt via `scripts/build_marts.py` from residual flags.
 - **Governance Note:** All insights, KPIs, and recommendations are traceable to documented source datasets, transformation logic, and analytical assumptions included in this repository.
-
 
 ---
 
@@ -63,6 +63,21 @@ Full citations: [`data/landing/DATA_SOURCES.csv`](./data/landing/DATA_SOURCES.cs
 
 ---
 
+
+## Key Metrics
+
+Reconciled across `data/marts/`, `sql/03_kpi_marts.sql`, Excel KPI recon, and `scripts/build_marts.py`.
+
+| Area | KPI | Value | Note |
+|---|---|---|---|
+| Group | Last-Q revenue / EBITDA | **₹51.1 Cr** / **₹5.8 Cr** | Last overlapping source quarter **2018Q1** (DataCo calendar) |
+| Bank | Default / fraud extract / churn | **30.0%** / **2.40%** / **26.54%** | Fraud extract % ≠ full ULB ~0.17% |
+| Mart | RFM Champions / viewed→paid | **1,028** / **35.0%** | Champions from fuller Retail II extract; checkout→paid ≈ 89.16% (stage rate) |
+| Care | Readmit / claims anomaly / ≤60d | **34.78%** / **5.01%** / **₹0.91 Cr** | Anomaly = 95th pctile residual vs OLS expected cost |
+| Logistics | Late / OTIF / MAPE / turns | **55.15%** / **44.79%** / **14.69%** / **12.28x** | OTIF from DataCo `Late_delivery_risk=0` |
+
+---
+
 ## Data Preparation Process
 
 1. **Landing** — store named public extracts under `data/landing/` with source citations.
@@ -98,7 +113,7 @@ Fluent Light theme (canvas `#F3F2F1`, accent `#118DFF`). Typical page pattern: *
 | | |
 |---|---|
 | **Objective** | Give leadership one page for last-quarter ₹ Cr book, margin, and BU mix |
-| **KPIs** | Group revenue **₹51.1 Cr** · EBITDA **₹5.8 Cr** · Active customers (extract headcount) · Avg NPS blend |
+| **KPIs** | Last-Q (**2018Q1** DataCo calendar) group revenue **₹51.1 Cr** · EBITDA **₹5.8 Cr** · Active customers (extract headcount) · Avg NPS blend |
 | **Visuals** | KPI cards · revenue trend by quarter · revenue by BU · QoQ growth % |
 | **Questions answered** | Which BU carries the FX-rolled book? Where did QoQ growth / decline concentrate? |
 
@@ -158,7 +173,7 @@ Fluent Light theme (canvas `#F3F2F1`, accent `#118DFF`). Typical page pattern: *
 | | |
 |---|---|
 | **Objective** | Prioritize lifecycle spend by RFM segment |
-| **KPIs** | Champions **1,028 (~20%)** · GMV concentration in top segments |
+| **KPIs** | Champions **1,028 (~20%)** (fuller Online Retail II extract than landing sample) · GMV concentration in top segments |
 | **Visuals** | Segment bars · value mix |
 | **Questions answered** | Who to win back (At Risk / Hibernating) vs protect (Champions)? |
 
@@ -168,7 +183,7 @@ Fluent Light theme (canvas `#F3F2F1`, accent `#118DFF`). Typical page pattern: *
 | | |
 |---|---|
 | **Objective** | Locate funnel drop using cancel/C-invoice structure as abandon proxy |
-| **KPIs** | Viewed→Paid conversion **35.0%** on calibrated sessions |
+| **KPIs** | Viewed→Paid **35.0%** (10,500/30,000 calibrated sessions); checkout→paid stage rate ≈ **89.16%** (not the primary conversion KPI) |
 | **Visuals** | Funnel · reason mix |
 | **Questions answered** | Where does conversion leak between view and paid? |
 
@@ -208,7 +223,7 @@ Fluent Light theme (canvas `#F3F2F1`, accent `#118DFF`). Typical page pattern: *
 | | |
 |---|---|
 | **Objective** | Route high residual claims for manual review |
-| **KPIs** | Anomaly rate **3.06%** (top residual vs expected cost) |
+| **KPIs** | Anomaly rate **5.01%** (95th pctile residual vs OLS expected cost: charges ~ age + bmi + smoker + children) |
 | **Visuals** | Residual distribution · review flags |
 | **Questions answered** | Which claims clear a review threshold on this extract? |
 
@@ -236,13 +251,13 @@ Fluent Light theme (canvas `#F3F2F1`, accent `#118DFF`). Typical page pattern: *
 
 ## Key Insights
 
-Numbers below are **computed from the public extracts in this repo** (see honesty box for proxies and samples).
+Numbers below are **computed from the public extracts in this repo** (see Data Scope & Assumptions for proxies and samples).
 
-1. **Group book is Care + Mart heavy on the FX-rolled last quarter** — revenue **₹51.1 Cr**, EBITDA **₹5.8 Cr** (margin ~11%). Implication: exec reviews should not treat Bank interest-proxy and Logistics sales as interchangeable with retail GMV.
+1. **Group book is Care + Mart heavy on the FX-rolled last overlapping source quarter (2018Q1)** — revenue **₹51.1 Cr**, EBITDA **₹5.8 Cr** (margin ~11%). Implication: exec reviews should not treat Bank interest-proxy and Logistics sales as interchangeable with retail GMV.
 2. **Credit risk is textbook-high on German Credit** — default **30.0%**. Implication: score-band underwriting and DTI-style splits belong on the Bank P0 pack, not a footnote.
 3. **Fraud review must respect stratification** — extract fraud rate **2.40%** because all frauds were kept; full ULB base rate is ~**0.17%**. Implication: never quote extract % as booked-loss without the footnote.
 4. **Retention pressure shows early** — Telco churn **26.54%** as bank/telco proxy. Implication: save plays belong on early-tenure / month-to-month style cohorts before spray discounts.
-5. **Retail value is concentrated** — **1,028 Champions** (~20%) drive disproportionate GMV; paid conversion **35%**. Implication: win-back At Risk / Hibernating and fix cart drop before broad acquisition spend.
+5. **Retail value is concentrated** — **1,028 Champions** (~20%, fuller Retail II extract) drive disproportionate GMV; viewed→paid **35%**. Implication: win-back At Risk / Hibernating and fix cart drop before broad acquisition spend.
 6. **Delivery is the loudest ops alarm** — late **55.15%**, OTIF **44.79%**. Implication: reset promise windows on hot DataCo categories/cities before new corridor CapEx narratives.
 7. **Care quality and formulary cash** — 30-day readmit **34.78%**; expiring ≤60d **₹0.91 Cr**. Implication: discharge triage + formulary transfer/promote are board-visible Care levers.
 8. **Forecast vs stock** — MAPE **14.69%**, turns **12.28x**. Implication: fix high-MAPE categories selectively; many SKUs can be worked with naive + turns without a new ML stack.
@@ -254,10 +269,10 @@ Numbers below are **computed from the public extracts in this repo** (see honest
 | Priority | Action | Lever | Data risk |
 |---|---|---|---|
 | 1 | Reset promise dates on late-hot DataCo categories/cities | Late 55% → OTIF | Sample, not live WMS |
-| 2 | Win-back At Risk + Hibernating RFM | GMV concentration | Snapshot RFM, no campaign lift |
+| 2 | Win-back At Risk + Hibernating RFM | GMV concentration | Snapshot RFM (Champions from fuller extract); no campaign lift |
 | 3 | Discharge triage on high readmit specialties | 34.8% `<30` flag | Enriched diabetes sample |
-| 4 | Review Critical-band card rules before booked-loss talk | Stratified 2.4% ≠ 0.17% | All frauds kept on purpose |
-| 5 | Do not treat group ₹ Cr as one P&L | Exec rollup only | Mixed calendars + FX |
+| 4 | Queue high-residual claims (95th-pctile OLS residual tail) for manual review | Residual-tail flags (5.01%) | Residual ≠ investigated fraud |
+| 5 | Do not treat group ₹ Cr as one P&L | Exec rollup only | Mixed calendars + FX; last Q = 2018Q1 |
 
 ---
 
@@ -273,20 +288,19 @@ Numbers below are **computed from the public extracts in this repo** (see honest
 
 ---
 
-## Technical Stack
+## Tools Used
 
-| Layer | Tools |
+| Tool | Use |
 |---|---|
-| BI / visuals | Power BI Desktop (`.pbip`), DAX, Power Query-style prep upstream |
-| Data modeling | Star-style semantic model, fact/mart + label tables |
-| Data prep | Excel (Dictionary / Cleaning log / KPI recon), CSV landing + cleaned + marts |
-| SQL | Staging, quality checks, KPI marts, RFM, market-entry (`sql/`) |
-| Python | Mart rebuild / residual flags (`scripts/build_marts.py`) |
+| **SQL** | Staging, quality checks, RFM, market-entry, KPI marts (`sql/01`–`05`) |
+| **Python** | Mart rebuild / residual flags (`scripts/build_marts.py`) |
+| **Excel** | Dictionary / Cleaning log / KPI recon (`excel/apex_group_dictionary_recon.xlsx`) |
+| **Power BI** | 14-page command center report (`dashboard/ApexGroup.pbip`), DAX, star-style semantic model |
 | Delivery | Page PNGs + silent walkthrough (`screenshots/`, `artifacts/`) |
 
 ---
 
-## Folder Structure
+## Repo Structure
 
 ```text
 apex-group-command-center/
@@ -297,10 +311,10 @@ apex-group-command-center/
 ├── data/
 │   ├── landing/               # public extracts + DATA_SOURCES.csv
 │   ├── cleaned/
-│   └── marts/
+│   └── marts/                 # KPI / RFM / claims residuals (incl. sample RFM rebuild path)
 ├── excel/                     # Dictionary / Cleaning log / KPI recon
 ├── screenshots/               # 01–14 page PNGs
-├── scripts/                   # build_marts.py
+├── scripts/                   # build_marts.py (claims residuals; optional sample RFM)
 └── sql/                       # staging · quality · KPI · RFM · market entry
 ```
 
