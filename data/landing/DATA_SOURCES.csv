@@ -1,0 +1,8 @@
+dataset,bu_page,url
+UCI Online Retail II,Apex Mart RFM / Cart,https://archive.ics.uci.edu/dataset/502/online+retail+ii
+IBM Telco Customer Churn,Apex Bank Churn,https://www.kaggle.com/datasets/blastchar/telco-customer-churn
+ULB Credit Card Fraud,Apex Bank Fraud,https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud
+German Credit (Statlog),Apex Bank Loans,https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data
+Diabetes 130-US Hospitals,Apex Care Readmit / Medicine,https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
+Medical Cost Personal Dataset,Apex Care Claims,https://www.kaggle.com/datasets/mirichoi0218/insurance
+DataCo Smart Supply Chain,Delivery / Logistics / Market / Ops,https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis
