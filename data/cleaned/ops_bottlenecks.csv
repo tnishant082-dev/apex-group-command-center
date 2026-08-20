@@ -1,0 +1,11 @@
+process,bu,actual,target,unit,gap,severity
+Loan default vs target book,Apex Bank,30.0,8.0,default_%,22.0,High
+Card fraud rate,Apex Bank,2.4,0.5,fraud_%,1.9,Low
+Customer churn,Apex Bank,26.5,15.0,churn_%,11.5,High
+Late delivery (DataCo),Apex Mart,55.15,15.0,late_%,40.2,High
+Cart paid conversion gap,Apex Mart,17.6,50.0,drop_%,-32.4,Low
+30-day readmission,Apex Care,34.8,9.0,readmit_%,25.8,High
+Claims anomaly rate,Apex Care,3.1,2.0,anom_%,1.1,Low
+OTIF miss rate,Apex Logistics,55.2,20.0,miss_%,35.2,High
+Demand forecast MAPE,Apex Logistics,14.69,12.0,mape_%,2.7,Low
+Inter-BU data latency,Group,48.0,12.0,hours,36.0,High
