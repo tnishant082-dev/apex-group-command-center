@@ -1,0 +1,47 @@
+table MartGroupKPI
+	lineageTag: MartGroupKPI-tag
+
+	partition MartGroupKPI = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("../../data/marts/mart_group_kpi.csv"),[Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+			    Promote = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    Promote
+
+	column bu
+		lineageTag: MartGroupKPI-bu
+		dataType: string
+		summarizeBy: none
+
+	column quarter
+		lineageTag: MartGroupKPI-quarter
+		dataType: string
+		summarizeBy: none
+
+	column revenue_cr
+		lineageTag: MartGroupKPI-revenue_cr
+		dataType: double
+		summarizeBy: none
+
+	column ebitda_cr
+		lineageTag: MartGroupKPI-ebitda_cr
+		dataType: double
+		summarizeBy: none
+
+	column customers
+		lineageTag: MartGroupKPI-customers
+		dataType: int64
+		summarizeBy: none
+
+	column nps
+		lineageTag: MartGroupKPI-nps
+		dataType: int64
+		summarizeBy: none
+
+	column rev_qoq_pct
+		lineageTag: MartGroupKPI-rev_qoq_pct
+		dataType: double
+		summarizeBy: none
+

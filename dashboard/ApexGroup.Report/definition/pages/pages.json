@@ -1,0 +1,19 @@
+{
+  "pageOrder": [
+    "page_group",
+    "page_ops",
+    "page_market",
+    "page_loans",
+    "page_fraud",
+    "page_churn",
+    "page_rfm",
+    "page_cart",
+    "page_delivery",
+    "page_readmit",
+    "page_medicine",
+    "page_claims",
+    "page_forecast",
+    "page_logistics"
+  ],
+  "activePageName": "page_group"
+}

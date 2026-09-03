@@ -1,0 +1,42 @@
+table OpsBottlenecks
+	lineageTag: OpsBottlenecks-tag
+
+	partition OpsBottlenecks = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("../../data/cleaned/ops_bottlenecks.csv"),[Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+			    Promote = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    Promote
+
+	column process
+		lineageTag: OpsBottlenecks-process
+		dataType: string
+		summarizeBy: none
+
+	column bu
+		lineageTag: OpsBottlenecks-bu
+		dataType: string
+		summarizeBy: none
+
+	column actual
+		lineageTag: OpsBottlenecks-actual
+		dataType: double
+		summarizeBy: none
+
+	column target
+		lineageTag: OpsBottlenecks-target
+		dataType: double
+		summarizeBy: none
+
+	column gap
+		lineageTag: OpsBottlenecks-gap
+		dataType: double
+		summarizeBy: none
+
+	column severity
+		lineageTag: OpsBottlenecks-severity
+		dataType: string
+		summarizeBy: none
+

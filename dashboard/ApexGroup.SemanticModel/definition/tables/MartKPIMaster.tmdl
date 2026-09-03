@@ -1,0 +1,22 @@
+table MartKPIMaster
+	lineageTag: MartKPIMaster-tag
+
+	partition MartKPIMaster = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("../../data/marts/mart_kpi_master.csv"),[Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+			    Promote = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    Promote
+
+	column kpi
+		lineageTag: MartKPIMaster-kpi
+		dataType: string
+		summarizeBy: none
+
+	column value
+		lineageTag: MartKPIMaster-value
+		dataType: double
+		summarizeBy: none
+

@@ -1,0 +1,37 @@
+table _Measures
+	lineageTag: measures-tag
+
+	measure Group Revenue Q2 Cr = SUM(MartGroupKPI[revenue_cr])
+		lineageTag: m-group-rev
+		formatString: #,0.0
+
+	measure Group EBITDA Q2 Cr = SUM(MartGroupKPI[ebitda_cr])
+		lineageTag: m-group-ebitda
+		formatString: #,0.0
+
+	measure Default Rate % =
+		LOOKUPVALUE(MartBankKPI[value], MartBankKPI[metric], "loan_default_rate_pct")
+		lineageTag: m-default
+		formatString: 0.00
+
+	measure Fraud Rate % =
+		LOOKUPVALUE(MartBankKPI[value], MartBankKPI[metric], "card_fraud_rate_pct")
+		lineageTag: m-fraud
+		formatString: 0.00
+
+	measure Churn Rate % =
+		LOOKUPVALUE(MartBankKPI[value], MartBankKPI[metric], "churn_rate_pct")
+		lineageTag: m-churn
+		formatString: 0.00
+
+	measure OTIF % = AVERAGE(MartLogisticsKPI[otif_pct])
+		lineageTag: m-otif
+		formatString: 0.00
+
+	measure MAPE % = AVERAGE(MartLogisticsKPI[mape_pct])
+		lineageTag: m-mape
+		formatString: 0.00
+
+	measure Readmit 30 % = AVERAGE(MartCareKPI[readmit_30_pct])
+		lineageTag: m-readmit
+		formatString: 0.00

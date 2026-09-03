@@ -1,0 +1,42 @@
+table MartCareKPI
+	lineageTag: MartCareKPI-tag
+
+	partition MartCareKPI = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("../../data/marts/mart_care_kpi.csv"),[Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+			    Promote = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    Promote
+
+	column readmit_30_pct
+		lineageTag: MartCareKPI-readmit_30_pct
+		dataType: double
+		summarizeBy: none
+
+	column avg_los
+		lineageTag: MartCareKPI-avg_los
+		dataType: double
+		summarizeBy: none
+
+	column expired_batches
+		lineageTag: MartCareKPI-expired_batches
+		dataType: int64
+		summarizeBy: none
+
+	column expiring_60d_value_cr
+		lineageTag: MartCareKPI-expiring_60d_value_cr
+		dataType: double
+		summarizeBy: none
+
+	column claims_anomaly_pct
+		lineageTag: MartCareKPI-claims_anomaly_pct
+		dataType: double
+		summarizeBy: none
+
+	column anomaly_amount_cr
+		lineageTag: MartCareKPI-anomaly_amount_cr
+		dataType: double
+		summarizeBy: none
+

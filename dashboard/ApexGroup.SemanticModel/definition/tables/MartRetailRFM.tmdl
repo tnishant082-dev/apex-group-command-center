@@ -1,0 +1,42 @@
+table MartRetailRFM
+	lineageTag: MartRetailRFM-tag
+
+	partition MartRetailRFM = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("../../data/marts/mart_retail_rfm.csv"),[Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+			    Promote = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    Promote
+
+	column customer_id
+		lineageTag: MartRetailRFM-customer_id
+		dataType: string
+		summarizeBy: none
+
+	column frequency
+		lineageTag: MartRetailRFM-frequency
+		dataType: int64
+		summarizeBy: none
+
+	column monetary
+		lineageTag: MartRetailRFM-monetary
+		dataType: double
+		summarizeBy: none
+
+	column recency_days
+		lineageTag: MartRetailRFM-recency_days
+		dataType: int64
+		summarizeBy: none
+
+	column RFM_score
+		lineageTag: MartRetailRFM-RFM_score
+		dataType: int64
+		summarizeBy: none
+
+	column segment
+		lineageTag: MartRetailRFM-segment
+		dataType: string
+		summarizeBy: none
+

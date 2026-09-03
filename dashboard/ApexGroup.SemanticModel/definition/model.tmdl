@@ -1,0 +1,21 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-IN
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+annotation PBI_QueryOrder = ["MartGroupKPI", "MartBankKPI", "MartRetailRFM", "MartCartFunnel", "MartCareKPI", "MartLogisticsKPI", "MartKPIMaster", "MarketEntry", "OpsBottlenecks"]
+
+ref table MartGroupKPI
+ref table MartBankKPI
+ref table MartRetailRFM
+ref table MartCartFunnel
+ref table MartCareKPI
+ref table MartLogisticsKPI
+ref table MartKPIMaster
+ref table MarketEntry
+ref table OpsBottlenecks
+ref table _Measures

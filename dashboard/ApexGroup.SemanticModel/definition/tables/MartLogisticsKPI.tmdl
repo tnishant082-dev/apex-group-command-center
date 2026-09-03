@@ -1,0 +1,42 @@
+table MartLogisticsKPI
+	lineageTag: MartLogisticsKPI-tag
+
+	partition MartLogisticsKPI = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("../../data/marts/mart_logistics_kpi.csv"),[Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+			    Promote = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    Promote
+
+	column mape_pct
+		lineageTag: MartLogisticsKPI-mape_pct
+		dataType: double
+		summarizeBy: none
+
+	column otif_pct
+		lineageTag: MartLogisticsKPI-otif_pct
+		dataType: double
+		summarizeBy: none
+
+	column on_time_pct
+		lineageTag: MartLogisticsKPI-on_time_pct
+		dataType: double
+		summarizeBy: none
+
+	column avg_inventory_turns
+		lineageTag: MartLogisticsKPI-avg_inventory_turns
+		dataType: double
+		summarizeBy: none
+
+	column overstock_skus
+		lineageTag: MartLogisticsKPI-overstock_skus
+		dataType: int64
+		summarizeBy: none
+
+	column stockout_risk_skus
+		lineageTag: MartLogisticsKPI-stockout_risk_skus
+		dataType: int64
+		summarizeBy: none
+

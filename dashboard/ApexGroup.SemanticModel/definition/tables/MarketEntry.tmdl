@@ -1,0 +1,32 @@
+table MarketEntry
+	lineageTag: MarketEntry-tag
+
+	partition MarketEntry = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("../../data/cleaned/market_entry_scorecard.csv"),[Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+			    Promote = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    Promote
+
+	column market
+		lineageTag: MarketEntry-market
+		dataType: string
+		summarizeBy: none
+
+	column sector_fit
+		lineageTag: MarketEntry-sector_fit
+		dataType: string
+		summarizeBy: none
+
+	column composite_score
+		lineageTag: MarketEntry-composite_score
+		dataType: double
+		summarizeBy: none
+
+	column recommendation
+		lineageTag: MarketEntry-recommendation
+		dataType: string
+		summarizeBy: none
+

@@ -1,0 +1,32 @@
+table MartBankKPI
+	lineageTag: MartBankKPI-tag
+
+	partition MartBankKPI = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("../../data/marts/mart_bank_kpis.csv"),[Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+			    Promote = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    Promote
+
+	column metric
+		lineageTag: MartBankKPI-metric
+		dataType: string
+		summarizeBy: none
+
+	column value
+		lineageTag: MartBankKPI-value
+		dataType: double
+		summarizeBy: none
+
+	column n
+		lineageTag: MartBankKPI-n
+		dataType: int64
+		summarizeBy: none
+
+	column defaults
+		lineageTag: MartBankKPI-defaults
+		dataType: int64
+		summarizeBy: none
+

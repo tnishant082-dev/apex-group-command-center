@@ -1,0 +1,27 @@
+table MartCartFunnel
+	lineageTag: MartCartFunnel-tag
+
+	partition MartCartFunnel = m
+		mode: import
+		source =
+			let
+			    Source = Csv.Document(File.Contents("../../data/marts/mart_cart_funnel.csv"),[Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+			    Promote = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    Promote
+
+	column stage
+		lineageTag: MartCartFunnel-stage
+		dataType: string
+		summarizeBy: none
+
+	column sessions
+		lineageTag: MartCartFunnel-sessions
+		dataType: int64
+		summarizeBy: none
+
+	column conversion_from_prior_pct
+		lineageTag: MartCartFunnel-conversion_from_prior_pct
+		dataType: double
+		summarizeBy: none
+
