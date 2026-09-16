@@ -1,4 +1,4 @@
--- KPI marts aligned to python/outputs/kpi_snapshot.json
+-- KPI marts aligned to the published data/marts KPI tables
 SELECT ROUND(AVG(default_flag)*100,2) AS bank_default_rate_pct FROM stg_bank_loans;
 SELECT ROUND(AVG(fraud_flag)*100,3) AS bank_fraud_rate_pct FROM stg_bank_card_txns;
 SELECT ROUND(AVG(churned)*100,2) AS bank_churn_rate_pct FROM stg_bank_customers;

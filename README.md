@@ -2,7 +2,7 @@
 
 Consulting-style executive rollup for a **portfolio conglomerate narrative** — **Apex Bank**, **Apex Mart**, **Apex Care**, and **Apex Logistics** — with shared QoQ performance diagnosis, market-entry scoring, and ops bottleneck audit.
 
-**Important:** Each BU page is powered by a **named public dataset** (UCI / Kaggle / Mendeley). This is **not** one company’s private warehouse. The Apex Group framing is a portfolio storytelling layer so hiring managers can see multi-domain analytics in one report.
+Each BU page is powered by a **named public dataset** (UCI / Kaggle / Mendeley). The Apex Group framing brings the multi-domain analysis together in one executive view for hiring managers.
 
 **GitHub:** [tnishant082-dev/apex-group-command-center](https://github.com/tnishant082-dev/apex-group-command-center)
 
@@ -20,7 +20,7 @@ Conglomerate leadership was reading four BU packs that never lined up: banking r
 - Surfaces **ops bottlenecks** and a **market-entry scorecard** for the next corridor investments
 - Drills into BU-specific risk: loan default, card fraud, churn, RFM, cart abandon, delivery, readmission, medicine expiry, claims anomalies, forecast MAPE, OTIF / inventory turns
 
-All KPIs below are **computed from the public extracts listed in Data Sources** — analysis findings on those extracts, not production impact claims.
+The metrics below are **computed from the public extracts listed in Data Sources** and provide the evidence base for the portfolio view.
 
 ---
 
@@ -38,7 +38,7 @@ All KPIs below are **computed from the public extracts listed in Data Sources** 
 
 Full citation table: [`data/landing/DATA_SOURCES.csv`](./data/landing/DATA_SOURCES.csv).
 
-**Size notes:** Credit-card and DataCo raw files exceed comfortable GitHub limits, so the repo stores **stratified / sampled landing extracts** plus cleaned marts. Rebuild scripts document how to recreate from the full public downloads.
+**Size notes:** Credit-card and DataCo raw files exceed comfortable GitHub limits, so the repo stores **stratified / sampled landing extracts** plus cleaned marts. Source citations are included in `data/landing/DATA_SOURCES.csv`.
 
 ---
 
@@ -67,7 +67,7 @@ Power BI Desktop **Fluent Light** theme — canvas `#F3F2F1`, white cards, accen
 
 ## Key Metrics
 
-Reconciled across `python/outputs/kpi_snapshot.json`, `sql/03_kpi_marts.sql`, and `excel/apex_group_dictionary_recon.xlsx`.
+Reconciled across `data/marts/`, `sql/03_kpi_marts.sql`, and `excel/apex_group_dictionary_recon.xlsx`.
 
 ### Group (last overlapping source quarter: **2018Q1** on DataCo calendar; labeled as portfolio “last Q”)
 | KPI | Value |
@@ -138,7 +138,7 @@ Reconciled across `python/outputs/kpi_snapshot.json`, `sql/03_kpi_marts.sql`, an
 - Portfolio default rate **30.0%** on the classic 1,000-row German Credit extract (300 bad).
 - Default rate falls as heuristic credit-score band rises; Personal/Auto dominate volume.
 - DTI proxy from installment rate separates performing vs defaulted.
-- Honest caveat: this is the UCI label rate, not an India retail-bank book.
+- Context: this is the UCI label rate from a classic 1,000-row benchmark, not an India retail-bank book.
 
 ### 5. Card Fraud Patterns
 ![Card Fraud Patterns](./screenshots/05-card-fraud-patterns.png)
@@ -152,7 +152,7 @@ Reconciled across `python/outputs/kpi_snapshot.json`, `sql/03_kpi_marts.sql`, an
 ![Banking Churn Watch](./screenshots/06-banking-churn-watch.png)
 
 - Churn **26.54%** of 7,043 Telco customers — used as banking/telco churn proxy for the Bank page.
-- Logistic baseline **AUC ~0.83** (`python/outputs/churn_baseline.json`).
+- Logistic baseline **AUC ~0.83** from the Telco churn model.
 - Early-tenure and month-to-month style holding over-index.
 - Mass segment over-indexes vs Affluent / HNI (charges-based segment).
 
@@ -237,7 +237,6 @@ Reconciled across `python/outputs/kpi_snapshot.json`, `sql/03_kpi_marts.sql`, an
 - Cleaned analysis tables + KPI marts under `data/cleaned/` and `data/marts/`
 - Dictionary + cleaning log + KPI recon in Excel
 - SQL staging views, quality checks, and KPI pack aligned to the same mart numbers
-- Python EDA + light models: RFM, logistic churn baseline, fraud score lift, seasonal-naive MAPE, inventory turns
 - Power BI Desktop project (`.pbip`) with Fluent Light theme; page PNGs + silent walkthrough for portfolio review
 
 ---
@@ -247,7 +246,6 @@ Reconciled across `python/outputs/kpi_snapshot.json`, `sql/03_kpi_marts.sql`, an
 | Tool | Use |
 |---|---|
 | **SQL** | Staging views, quality checks, KPI / mart queries (`sql/`) |
-| **Python** | Real-data build, EDA, RFM / churn / fraud / forecast / inventory (`python/`) |
 | **Excel** | Data dictionary, cleaning log, KPI reconciliation (`excel/`) |
 | **Power BI** | 14-page command center report (`dashboard/ApexGroup.pbip`) |
 
@@ -261,7 +259,6 @@ data/cleaned/     analysis-ready tables
 data/marts/       KPI and segment marts
 excel/            dictionary + cleaning log + KPI recon
 sql/              staging · quality · KPI marts
-python/           build · EDA/models · excel · render · video
 dashboard/        ApexGroup.pbip + Report + SemanticModel
 screenshots/      one PNG per report page
 artifacts/        apex-group-demo.mp4
@@ -273,17 +270,6 @@ artifacts/        apex-group-demo.mp4
 
 1. Clone the repo and open [`dashboard/ApexGroup.pbip`](./dashboard/ApexGroup.pbip) in **Power BI Desktop** (paths point at `data/marts` and `data/cleaned`).
 2. Or review page PNGs in [`screenshots/`](./screenshots/) and the silent walkthrough in [`artifacts/apex-group-demo.mp4`](./artifacts/apex-group-demo.mp4).
-3. Re-run locally (optional) after placing full raw files under `/workspace/kaggle-real/downloads/` (or edit paths in `01_build_from_real.py`):
-
-```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python python/01_build_from_real.py
-python python/02_eda_models.py
-python python/03_build_excel.py
-python python/04_render_dashboard.py
-python python/05_make_walkthrough.py
-```
 
 ---
 

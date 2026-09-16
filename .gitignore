@@ -4,6 +4,5 @@ __pycache__/
 .venv-vertex/
 .DS_Store
 *.tmp
-python/outputs/.cache/
 .ipynb_checkpoints/
 .agent-report/
